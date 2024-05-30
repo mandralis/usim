@@ -1,3 +1,4 @@
+% USING GIT
 % clear workspace
 clear all
 close all
