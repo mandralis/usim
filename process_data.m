@@ -1,4 +1,5 @@
-% USING GIT
+% IM ON NEW BRANCH
+
 % clear workspace
 clear all
 close all
