@@ -1,14 +1,16 @@
-% TEST
-
 % clear workspace
 clear all
 close all
 clc
 
+% add necessary paths
+addpath(genpath('src/'));
+addpath(genpath('utils/'));
+
 data_path = 'data_05_26_2024_16_54_50/';
+addpath(genpath([get_local_data_path(),data_path]));
 load([data_path,'acquisition_params.mat']);
 
-addpath([get_local_data_path(),data_path])
 
 % get acquisition parameters
 n_acquisition_cycles             = acquisition_params.n_acquisition_cycles;
