@@ -5,6 +5,9 @@ clear all
 close all
 clc
 
+% add local data path to matlab path
+addpath(get_data_path());
+
 data_path = 'data_05_26_2024_16_54_50/';
 load([data_path,'acquisition_params.mat']);
 
