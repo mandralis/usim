@@ -5,11 +5,11 @@ function [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(datap
     ny = image_crop_array(2)-image_crop_array(1)+1;
 
     % function handle producing the file path
-    filepath = @ (i) [datapath, ['/Y7-S3 Camera',num2str(i,'%06.f'),'.tif']];
-    i = 1;
+    filepath = @ (i) [datapath, ['Y7-S3 Camera',num2str(i,'%06.f'),'.tif']];
+    i = 0;
 
     % count number of files
-    while isfile(filepath(i))
+    while exist(filepath(i),'file') == 2
         i = i+1;
     end
     N=i-1;
@@ -20,11 +20,11 @@ function [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(datap
     y_array         = zeros(N,nx);
 
     i=1;
-    while isfile(filepath(i))
+    while exist(filepath(i-1),'file') == 2
         disp(['Iteration: ',num2str(i)])
 
         % read image
-        im = imread(filepath(i));
+        im = imread(filepath(i-1));
 
         % mask image
         im_masked = Grayim2mask(im,mask_threshold,image_crop_array);
