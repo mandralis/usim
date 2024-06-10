@@ -12,6 +12,6 @@ plot(X_cut(100,:))
 
 %% plot
 for i = 1:size(X_cut,1)
-    plot(X(i,:))
+    plot(X_cut(i,:))
     pause(0.01)
 end

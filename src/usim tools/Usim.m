@@ -1,15 +1,18 @@
 classdef Usim
     properties
-        X;         % waveform data
-        Y;         % curvature array
-        wavelets;  % calibration wavelets in a cell array
-        x_start;   % this might be unecessary
-        N_samples;  % number of samples per waveform
-        N_waveforms;
-        N_wavelets;
-        M;         % collocation matrix
-        A;         % predicted amplitudes
-        X_hat;     % predicted data based on fit
+        % inputs
+        X;                % waveform data
+        Y;                % curvature array
+        wavelets;         % calibration wavelets in a cell array
+        x_start;          % this might be unecessary
+        
+        % class properties
+        N_samples;        % number of samples per waveform
+        N_waveforms;      % number of waveforms
+        N_wavelets;       % number of wavelets/surface features
+        M;                % collocation matrix
+        A;                % predicted amplitudes
+        X_hat;            % predicted data based on fit
     end
     methods
         function A = forward(obj,X)
