@@ -73,6 +73,19 @@ for i = 1:n_acquisition_cycles
     
 end
 
+%% fix X matrix to make everything line up
+% probably a modified version of get start of pulse function
+
+[a,b] = size(X);
+
+for j = 1:a 
+    
+    ind = find(X(j,1:100) < spike_detect_thresh);
+    position = ind(1);
+    
+    X(j,1:b-(position-1)) = X(j,position:end);
+    
+end
 %%
 % save waveform data Currently saves to the local directory cause im lazy 
 % save([data_path,'X.mat'],'X');
