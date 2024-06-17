@@ -25,14 +25,14 @@ classdef Usim
 
         function obj = Usim(wavelets,X,Y,x_start)
             % assign class properties
-            obj.wavelets = wavelets;
-            obj.X        = X;
-            obj.Y        = Y;
-            obj.x_start  = x_start;
-            obj.N_samples = size(X,2);
+            obj.wavelets    = wavelets;
+            obj.X           = X;
+            obj.Y           = Y;
+            obj.x_start     = x_start;
+            obj.N_samples   = size(X,2);
             obj.N_waveforms = size(X,1);
-            obj.N_wavelets = length(wavelets);
-            obj.M        = get_collocation_matrix(wavelets,obj.N_samples,x_start);
+            obj.N_wavelets  = length(wavelets);
+            obj.M           = get_collocation_matrix(wavelets,obj.N_samples,x_start);
             
             % call forward method to get the wavelet amplitudes
             obj.A        = obj.forward(obj.X);
