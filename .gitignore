@@ -1,3 +1,7 @@
 **/data_*
 **/.DS_Store
 **/*.asv
+**/*.pth
+**/*.onnx
+**/+model
+**/*.pyc
