@@ -1,36 +1,37 @@
 % clear workspace
-clear all
-close all
-clc
+% clear all
+% close all
+% clc
+
+% add necessary paths
+addpath(genpath('src/'));
+addpath(genpath('utils/'));
 
 data_path = 'data_05_26_2024_16_54_50/';
-load([data_path,'params.mat']);
+addpath(genpath([get_local_data_path(),data_path]));
+load([data_path,'acquisition_params.mat']);
+load([data_path,'X.mat']);
 
-% get key parameters
-n_acquisition_cycles             = params.n_acquisition_cycles;
-n_samples_per_acquisition_cycle  = params.n_samples_per_acquisition_cycle;
-n_triggers_per_acquisition_cycle = params.n_triggers_per_acquisition_cycle;
 
-% get derived parameters
-n_waveforms            = n_acquisition_cycles*n_triggers_per_acquisition_cycle;
-n_samples_per_waveform = n_samples_per_acquisition_cycle/n_triggers_per_acquisition_cycle;
+%time position of sensors being used
+sensor_indeces = [1308, 1395, 1488,1584];
 
-% define the data frame 
-X = zeros(n_waveforms,n_samples_per_waveform);
-for i = 1:n_acquisition_cycles
-    % display counter
-    disp(i)
 
-    % load one acquisition cycle worth of data
-    load([data_path,'pulse_',num2str(i),'.mat']);
+[a,b] = size(X);
+
+%find amplitude components of these sensors
+for i = 1:a
+   
+    i
+    spect = cwt(X(i,1:2000),2500000);
     
-    % get start and end indices
-    start_idx = 1 + (i-1)*n_triggers_per_acquisition_cycle;
-    end_idx   = i*n_triggers_per_acquisition_cycle;
-    
-    % put reshaped data into data frame
-    X(start_idx:end_idx,:) = reshape(w,n_samples_per_waveform,n_triggers_per_acquisition_cycle)';
+    for j = 1:4
+        ampl(i,j) = abs(spect(20,sensor_indeces(j)));
+        
+    end
+       
+
 end
 
-% save data 
-save([data_path,'X.mat'],'X');
+%%
+save('ampl.mat','ampl');
