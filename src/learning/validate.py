@@ -7,7 +7,7 @@ from train import ConvNet, TrainingDataset
 
 # load data
 X     = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/X.mat')['X'][:,:2000]
-Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative.mat')['Theta_relative']
+Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative_8_joints.mat')['Theta_relative']
 
 # Convert data to tensor and float32
 X = torch.tensor(X).float()
@@ -55,8 +55,6 @@ example_input = X[0].unsqueeze(0)
 torch.onnx.export(model, example_input, "model.onnx", export_params=True, opset_version=11,
                 do_constant_folding=True, input_names=['input'], output_names=['output'])
 
-embed()
-
 # Perform inference
 batch_size = 3990  # all data including train and validation data 
 Theta_predicted = model(X[:batch_size,:])
@@ -64,7 +62,7 @@ print(Theta_predicted)
 print(Theta[:batch_size,:])
 plt.figure(figsize=(12, 6))
 for i in range(dim_out):
-    plt.subplot(2, 2, i+1)
+    plt.subplot(3, 3, i+1)
     plt.plot(Theta[:batch_size, i].detach().numpy(), 'b', label='Actual')
     plt.plot(Theta_predicted[:batch_size, i].detach().numpy(), 'r', label='Predicted')
     plt.xlabel('Sample')

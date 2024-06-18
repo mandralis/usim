@@ -10,7 +10,7 @@ import scipy.io as sio
 
 # load data
 X     = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/X.mat')['X'][:,:2000]
-Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative.mat')['Theta_relative']
+Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative_8_joints.mat')['Theta_relative']
 
 # Convert data to tensor and float32
 X = torch.tensor(X).float()
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     dim_in        = X.shape[1]
     dim_out       = Theta.shape[1]
     learning_rate = 0.001
-    num_epochs    = 300
+    num_epochs    = 1000
     validation_split = 0.2  # 20% of the data will be used for validation
 
     # Create train-validation split
