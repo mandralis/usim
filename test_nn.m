@@ -10,7 +10,7 @@ net = importONNXNetwork('model.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork
 load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/X.mat');
 load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Px_array.mat');
 load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Py_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative.mat');
+load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative_8_joints.mat');
 
 %% get normalized input data
 
@@ -32,15 +32,28 @@ L = Px(1,end);
 py_clamp = Py(1,1);
 
 %% number of joints on kinematic linkage
-N_joints = 4;
+N_joints = 8;
 
-%% split wire in 4 equal segments
-a = L/N_joints;
+%% split wire in N_joints equal segments
+a_ = L/N_joints;
+a = [0, a_ * ones(1,N_joints)];
 
 %% test neural network against data 
 
+% init filter
+alpha = 0.7;
+filter = ExponentialSmoothingFilter(N_joints,alpha);
+% N_window = 1;
+% filter = MovingAverageFilter(N_joints,N_window);
+% q = 1;
+% r = 1e-2;
+% filter = KalmanFilter(N_joints,q,r);
+
 Theta_predicted = zeros(size(Theta_relative));
 for i = 1:size(Px,1)
+    
+    % get current starting position
+    py_clamp = Py(i,1);
 
     % Convert input data to a dlarray
     dlInput = dlarray(X_normalized(i,1:2000), 'BC');
@@ -49,14 +62,21 @@ for i = 1:size(Px,1)
     % unnormalize the output
     Theta_relative_ = Theta_relative_normalized .* (Theta_relative_std' + 1e-6) + Theta_relative_mean';
 
-    Theta_predicted(i,:) = Theta_relative_;
+    % filter with kalman filter
+    Theta_relative_filtered = filter.update(Theta_relative_);
+
+    Theta_predicted(i,:) = Theta_relative_filtered;
 
     % plot kinematic linkage with given angles
     plot(Px(i,:),Py(i,:),"Color",'b',LineWidth=1.0);
     axis([0,L,0,1080])
     hold on
-    Pkin = forward_kin(0,a,a,a,a,Theta_relative_(1),Theta_relative_(2),Theta_relative_(3),Theta_relative_(4));
+    Pkin = forward_kin(a,Theta_relative_filtered');
+    Pkin_unfiltered = forward_kin(a,Theta_relative_');
+
     plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
+    plot(Pkin_unfiltered(2,:),Pkin_unfiltered(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'g','MarkerEdgeColor','k',LineWidth=1.0);
+
     pause(0.01);
     clf;
 end

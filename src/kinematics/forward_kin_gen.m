@@ -47,7 +47,7 @@ for i = 1:n_joints
 end
 
 % make a matlab function for later use
-forward_kinematics = matlabFunction(pos,"File","src/kinematics/forward_kin");
+forward_kinematics = matlabFunction(pos,"File","src/kinematics/forward_kin","Vars",{a,t});
 
 %function used to calculate twist matrices
 function mat = twist(w,v,theta)
