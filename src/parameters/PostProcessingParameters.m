@@ -6,8 +6,8 @@ classdef PostProcessingParameters
         smooth_before_fit                 = false;
         
         %phase delay parameters 
-        spike_detect_thresh               = -0.45;
-        noise_floor                       = 0.02
+        spike_detect_thresh               = -3;
+        noise_floor                       = 0.15
         zero_length                       = 1000;
     end
 end

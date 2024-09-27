@@ -7,5 +7,6 @@ function fname = new_folder(name)
     time.Format = 'MM_dd_yyyy_HH_mm_ss';
     fname = char(time);
     fname = [name,'_',fname];
-    mkdir([local_data_path,fname]);
+    fname = [local_data_path,fname];
+    mkdir(fname);
 end

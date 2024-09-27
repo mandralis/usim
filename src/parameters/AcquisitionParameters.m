@@ -2,7 +2,7 @@ classdef AcquisitionParameters
     properties
         % data acquisition parameters
         n_acquisition_cycles_max          = 50;
-        n_acquisition_cycles              = 10;
+        n_acquisition_cycles              = 50;
         t_per_acquisition                 = 2.5; % we are only actually triggering for 2 seconds but give 0.5 seconds buffer
         
         % data processing parameters
