@@ -86,14 +86,14 @@ if __name__ == '__main__':
 
     # Set hyperparameters
     dim_n_joints = 8
-    batch_size = 128 # really important but 128 is a good start
-    # layer_dims = [512,256,128,64,32]
-    layer_dims = [1024,512,256]
+    batch_size = 512 # really important but 128 is a good start
+    layer_dims = [512,256,128,64,32]
+    # layer_dims = [1024,512,256]
     kernel_size = 3
     dim_in = X.shape[1]
     dim_out = Theta.shape[1]
     learning_rate = 0.0005
-    num_epochs = 1500
+    num_epochs = 2500
     validation_split = 0.2  # 20% of the data will be used for validation
 
     # Create train folder

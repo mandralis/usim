@@ -6,7 +6,7 @@ from IPython import embed
 from train import ConvNet
 
 # Train folder path
-train_path = "/home/m4pc/usim/src/learning/learned_models/20241024-075214"
+train_path = "/home/m4pc/usim/src/learning/+learned_models/20241024-093048"
 
 # Load data
 train_data           = torch.load(os.path.join(train_path, 'train_data.pth'))
