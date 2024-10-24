@@ -1,10 +1,10 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
-import numpy as np 
+import numpy as np
 from IPython import embed
 import datetime
-import os 
+import os
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn as nn
 import torch.optim as optim
@@ -37,7 +37,7 @@ class ConvNet(nn.Module):
         self.conv4 = nn.Conv1d(layer_dims[2], layer_dims[3], kernel_size=kernel_size, stride=stride, padding=padding)
         self.bn4 = nn.BatchNorm1d(layer_dims[3])
         self.relu = nn.ReLU()
-        self.fc = nn.Linear(layer_dims[3] , dim_out)
+        self.fc = nn.Linear(layer_dims[3], dim_out)
 
     def forward(self, x_):
         x = x_
@@ -67,17 +67,22 @@ def custom_loss(pred_theta, true_theta):
     return loss1
 
 if __name__ == '__main__':
-    # Set device
-    device = torch.device('mps')
+    # Set device to use available CUDA devices (multi-GPU support)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Load data
-    nx_start, nx_end = 1200, 2200
-    X     = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/X.mat')['X'][:, nx_start:nx_end]
-    Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative_8_joints.mat')['Theta_relative']
+    nx_start, nx_end = 200, 1200
+    X = sio.loadmat('/home/m4pc/Desktop/data_09_27_2024_15_40_55/X.mat')['X'][:, nx_start:nx_end]
+    Theta = sio.loadmat('/home/m4pc/Desktop/data_09_27_2024_15_40_55/Theta_relative.mat')['Theta_relative']
 
     # Convert data to tensor and float32
     X = torch.tensor(X).float().to(device)
     Theta = torch.tensor(Theta).float().to(device)
+
+    # remove nans from theta and adapt X to have the same size
+    nan_indices = torch.isnan(Theta).any(axis=1)
+    X = X[~nan_indices]
+    Theta = Theta[~nan_indices]
 
     # Normalize the input data
     X_mean = torch.mean(X, dim=0)
@@ -92,7 +97,7 @@ if __name__ == '__main__':
     # Set hyperparameters
     dim_n_joints = 8
     batch_size = 128
-    layer_dims = [512,256,128,64]
+    layer_dims = [512, 256, 128, 64]
     kernel_size = 3
     dim_in = X.shape[1]
     dim_out = Theta.shape[1]
@@ -102,7 +107,7 @@ if __name__ == '__main__':
 
     # Create train folder
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    folder_path = f"/Users/imandralis/src/usim/src/learning/learned_models/{timestamp}"
+    folder_path = f"/home/m4pc/usim/src/learning/+learned_models/{timestamp}"
     os.makedirs(folder_path, exist_ok=True)
 
     # Save config
@@ -151,12 +156,20 @@ if __name__ == '__main__':
     torch.save(val_data, val_data_path)
     print(f'Train data saved at {train_data_path}')
     print(f'Validation data saved at {val_data_path}')
-    
+
     # Create an instance of the ConvNet model
     model = ConvNet(dim_in, dim_out, layer_dims, kernel_size=kernel_size)
 
     # Convert model parameters to float32 and put on device
-    model = model.float().to(device)
+    model = model.float()
+
+    # Enable multi-GPU support with DataParallel
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs!")
+        model = nn.DataParallel(model)
+
+    # Move model to device (GPUs)
+    model = model.to(device)
 
     # Define loss function and optimizer
     criterion = custom_loss
@@ -182,8 +195,8 @@ if __name__ == '__main__':
             train_loss = 0.0
             for inputs, targets in train_loader:
                 # Forward pass
-                inputs = inputs.float()
-                targets = targets.float()
+                inputs = inputs.float().to(device)
+                targets = targets.float().to(device)
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
 
@@ -201,8 +214,8 @@ if __name__ == '__main__':
             val_loss = 0.0
             with torch.no_grad():
                 for inputs, targets in val_loader:
-                    inputs = inputs.float()
-                    targets = targets.float()
+                    inputs = inputs.float().to(device)
+                    targets = targets.float().to(device)
                     outputs = model(inputs)
                     val_loss += criterion(outputs, targets).item()
 
