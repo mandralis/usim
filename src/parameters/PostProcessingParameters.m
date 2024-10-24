@@ -8,8 +8,8 @@ classdef PostProcessingParameters
         wire_length                       = 1500;
         
         %phase delay parameters 
-        spike_detect_thresh               = -3;
-        noise_floor                       = 0.15
+        spike_detect_thresh               = -1.5;
+        noise_floor                       = 0.07
         zero_length                       = 1000;
     end
 end

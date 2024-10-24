@@ -23,7 +23,7 @@ function [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(datap
     i=1;
     while exist(filepath(i-1),'file') == 2
         
-        disp(['Iteration: ',num2str(i)])
+%         disp(['Iteration: ',num2str(i)])
 
         % read image
         im = imread(filepath(i-1));

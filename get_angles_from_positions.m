@@ -3,9 +3,9 @@ close all
 clc
 
 %% load
-% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Px_array.mat');
-% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Py_array.mat');
-load('C:\Users\arosa\Desktop\matlab.mat')
+load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Px_array.mat');
+load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Py_array.mat');
+% load('C:\Users\arosa\Desktop\matlab.mat')
 
 %% get number of data points
 N_samples = size(Px,1);
