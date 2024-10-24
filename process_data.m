@@ -7,10 +7,10 @@ clc
 addpath(genpath('src/'));
 addpath(genpath('utils/'));
 
-data_path = 'data_05_26_2024_16_54_50/';
-addpath(genpath([get_local_data_path(),data_path]));
-load([data_path,'acquisition_params.mat']);
-
+data_path = 'data_06_21_2024_14_35_56\';
+fname = [get_local_data_path(),data_path];
+addpath(genpath(fname));
+load([fname,'acquisition_params.mat']);
 
 % get acquisition parameters
 n_acquisition_cycles             = acquisition_params.n_acquisition_cycles;
@@ -40,6 +40,8 @@ X = zeros(n_waveforms,n_samples_per_waveform);
 Y = zeros(n_waveforms,n_length_of_curv_array);
 Px = zeros(n_waveforms,n_length_of_curv_array);
 Py = zeros(n_waveforms,n_length_of_curv_array);
+
+%%
 for i = 1:n_acquisition_cycles
     % display counter
     disp(i)
@@ -67,8 +69,8 @@ for i = 1:n_acquisition_cycles
     Y(start_idx:end_idx,:) = curvature_array(1:end-1,:);
     Px(start_idx:end_idx,:) = x_array(1:end-1,:);
     Py(start_idx:end_idx,:) = y_array(1:end-1,:);
-    %now remove the last frame and append to the end of a big list (this may be done already)
-    
+%     %now remove the last frame and append to the end of a big list (this may be done already)
+%     
     
     
 end
@@ -88,19 +90,18 @@ for j = 1:a
 end
 %%
 % save waveform data Currently saves to the local directory cause im lazy 
-% save([data_path,'X.mat'],'X');
-save('X.mat','X');
+save([fname,'X.mat'],'X');
 
 % curvature array and position arrays
-% save([data_path,'Y.mat'],'Y');
-% save([data_path,'Px_array.mat'],'Px');
-% save([data_path,'Py_array.mat'],'Py');
-save('Y.mat','Y');
-save('Px_array.mat','Px');
-save('Py_array.mat','Py');
+save([fname,'Y.mat'],'Y');
+save([fname,'Px_array.mat'],'Px');
+save([fname,'Py_array.mat'],'Py');
+% save('Y.mat','Y');
+% save('Px_array.mat','Px');
+% save('Py_array.mat','Py');
 
 % save post_processing parameters
-% save([fname,'/post_processing_params.mat'],'post_processing_params');
+save([fname,'/post_processing_params.mat'],'post_processing_params');
 
 %%
 
