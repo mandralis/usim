@@ -6,7 +6,7 @@ from IPython import embed
 from train import ConvNet
 
 # Train folder path
-train_path = "/Users/imandralis/src/usim/src/learning/learned_models/20240620-142926"
+train_path = "/Users/imandralis/src/usim/src/learning/learned_models/best_conv1d"
 
 # Load data
 train_data           = torch.load(os.path.join(train_path, 'train_data.pth'))
@@ -41,7 +41,7 @@ Theta_std = val_data['Theta_std'].cpu()
 Theta_predicted_val = Theta_predicted_val * Theta_std + Theta_mean
 Theta_val = Theta * Theta_std + Theta_mean
 
-# Plot the results on the validation set
+# Plot the results on the full set (training + validation)
 plt.figure(figsize=(12, 6))
 for i in range(config.get('dim_out')):
     plt.subplot(3, 3, i+1)
@@ -52,25 +52,4 @@ for i in range(config.get('dim_out')):
     plt.title(f'Angle {i+1}')
     plt.legend()
 plt.tight_layout()
-
-# make another plot for results on train set
-Theta_predicted_train = model(X)
-
-# unnormalize the angles
-Theta_mean = train_data['Theta_mean'].cpu()
-Theta_std = train_data['Theta_std'].cpu()
-Theta_predicted_train = Theta_predicted_train * Theta_std + Theta_mean
-Theta_train = Theta * Theta_std + Theta_mean
-
-plt.figure(figsize=(12, 6))
-for i in range(config.get('dim_out')):
-    plt.subplot(3, 3, i+1)
-    plt.plot(Theta_train[:, i].detach().numpy(), 'b', label='Actual')
-    plt.plot(Theta_predicted_train[:, i].detach().numpy(), 'r', label='Predicted')
-    plt.xlabel('Sample')
-    plt.ylabel('Angle')
-    plt.title(f'Angle {i+1}')
-    plt.legend()
-plt.tight_layout()
-
 plt.show()
