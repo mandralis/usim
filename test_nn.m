@@ -4,7 +4,7 @@ clc
 
 %% import neural net
 % Import the ONNX model as a dlnetwork
-net = importONNXNetwork('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/model.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork', 'dlnetwork');
+net = importONNXNetwork('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/model3.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork', 'dlnetwork');
 
 %% load
 load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/X.mat');
@@ -73,7 +73,7 @@ filtering       = true;
 Theta_predicted = zeros(size(Theta_relative));
 figure();
 hold on;
-for i = 1:10:size(Px,1)
+for i = 1:size(Px,1)
     % get current starting position
     py_clamp = Py(i,1);
 
