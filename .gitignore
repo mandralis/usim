@@ -3,6 +3,5 @@
 **/*.asv
 **/*.pth
 **/*.onnx
-**/+model
 **/*.pyca
 src/learning/logs
