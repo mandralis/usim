@@ -1,22 +1,22 @@
-clear all
-close all
-clc
-
-%% load
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Px_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Py_array.mat');
+% clear all
+% close all
+% clc
+% 
+% %% load
+% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Px_array.mat');
+% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Py_array.mat');
 
 %% get number of data points
 N_samples = size(Px,1);
 
 %% get wire length in pixels
-L = Px(1,end);
+L = max(Px(1,:));
 
 %% get wire clamped position in y
 py_clamp = Py(1,1);
 
 %% number of joints on kinematic linkage
-N_joints = 8;
+N_joints = 9;
 
 %% split wire in n_joints equal segments
 a_ = L/N_joints;
@@ -27,7 +27,7 @@ a = [0, a_ * ones(1,N_joints)];
 Theta = zeros(N_samples,N_joints);
 Theta_relative = zeros(N_samples,N_joints);
 figure();
-for i = 1:size(Px,1)
+for i = 1:10:size(Px,1)
     % get current starting y position
     py_clamp = Py(i,1);
 
@@ -67,7 +67,7 @@ for i = 1:size(Px,1)
     clf;
 end
 
-save('Theta_relative.mat','Theta_relative')
+% save('Theta_relative.mat','Theta_relative')
 
 % %% test fit
 % % linear regression to map amplitudes to angles 
