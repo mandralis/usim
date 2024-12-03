@@ -24,40 +24,30 @@ class TrainingDataset(Dataset):
         theta = self.Theta[idx]
         return x, theta
 
-# Define 1D convolutional neural network model with batch normalization
 class ConvNet(nn.Module):
     def __init__(self, dim_in, dim_out, layer_dims=[512,256,128,64], kernel_size=3, stride=1, padding=1):
         super(ConvNet, self).__init__()
-        self.conv1 = nn.Conv1d(dim_in, layer_dims[0], kernel_size=kernel_size, stride=stride, padding=padding)
-        self.bn1 = nn.BatchNorm1d(layer_dims[0])
-        self.conv2 = nn.Conv1d(layer_dims[0], layer_dims[1], kernel_size=kernel_size, stride=stride, padding=padding)
-        self.bn2 = nn.BatchNorm1d(layer_dims[1])
-        self.conv3 = nn.Conv1d(layer_dims[1], layer_dims[2], kernel_size=kernel_size, stride=stride, padding=padding)
-        self.bn3 = nn.BatchNorm1d(layer_dims[2])
-        self.conv4 = nn.Conv1d(layer_dims[2], layer_dims[3], kernel_size=kernel_size, stride=stride, padding=padding)
-        self.bn4 = nn.BatchNorm1d(layer_dims[3])
-        self.relu = nn.ReLU()
-        self.fc = nn.Linear(layer_dims[3] , dim_out)
-
-    def forward(self, x_):
-        x = x_
-
-        # pass everything into network
-        x = x.T
-        x = self.conv1(x)
-        x = self.bn1(x.T)
-        x = self.relu(x)
-        x = self.conv2(x.T)
-        x = self.bn2(x.T)
-        x = self.relu(x)
-        x = self.conv3(x.T)
-        x = self.bn3(x.T)
-        x = self.relu(x)
-        x = self.conv4(x.T)
-        x = self.bn4(x.T)
-        x = self.relu(x)
         
-        # concatenate 
+        self.conv_layers = nn.ModuleList()
+        self.bn_layers = nn.ModuleList()
+        self.relu_layers = nn.ModuleList()
+        
+        in_channels = dim_in
+        
+        for out_channels in layer_dims:
+            self.conv_layers.append(nn.Conv1d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding))
+            self.bn_layers.append(nn.BatchNorm1d(out_channels))
+            self.relu_layers.append(nn.ReLU())
+            in_channels = out_channels
+        
+        self.fc = nn.Linear(layer_dims[-1], dim_out)
+
+    def forward(self, x):        
+        for conv_layer, bn_layer, relu_layer in zip(self.conv_layers, self.bn_layers, self.relu_layers):
+            x = conv_layer(x.T)
+            x = bn_layer(x.T)
+            x = relu_layer(x)
+        
         x = self.fc(x)
         return x
 
@@ -71,9 +61,15 @@ if __name__ == '__main__':
     device = torch.device('mps')
 
     # Load data
-    nx_start, nx_end = 1200, 2200
-    X     = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/X.mat')['X'][:, nx_start:nx_end]
-    Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative_8_joints.mat')['Theta_relative']
+    # nx_start, nx_end = 1200, 2200
+    # X     = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/X.mat')['X'][:, nx_start:nx_end]
+    # Theta = sio.loadmat('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_relative_8_joints.mat')['Theta_relative']
+
+    nx_start, nx_end = 200, 1200
+    X     = sio.loadmat('/Users/imandralis/Downloads/data_09_27_2024_15_40_55/X.mat')['X'][:, nx_start:nx_end]
+    Theta = sio.loadmat('/Users/imandralis/Downloads/data_09_27_2024_15_40_55/Theta_relative.mat')['Theta_relative']
+
+    embed()
 
     # Convert data to tensor and float32
     X = torch.tensor(X).float().to(device)
@@ -91,12 +87,13 @@ if __name__ == '__main__':
 
     # Set hyperparameters
     dim_n_joints = 8
-    batch_size = 128
-    layer_dims = [512,256,128,64]
+    batch_size = 128 # really important but 128 is a good start
+    # layer_dims = [512,256,128,64,32]
+    layer_dims = [1024,512,256]
     kernel_size = 3
     dim_in = X.shape[1]
     dim_out = Theta.shape[1]
-    learning_rate = 0.001
+    learning_rate = 0.0005
     num_epochs = 1500
     validation_split = 0.2  # 20% of the data will be used for validation
 
@@ -115,7 +112,9 @@ if __name__ == '__main__':
         'dim_out': dim_out,
         'learning_rate': learning_rate,
         'num_epochs': num_epochs,
-        'validation_split': validation_split
+        'validation_split': validation_split,
+        'nx_start': nx_start,
+        'nx_end': nx_end
     }
     config_path = os.path.join(folder_path, "config.pth")
     torch.save(config, config_path)

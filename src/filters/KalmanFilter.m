@@ -37,10 +37,10 @@ classdef KalmanFilter
             obj.n_joints    = n_joints;
             obj.F           = eye(n_joints);
             obj.H           = eye(n_joints);
-            obj.xkm1km1     = zeros(n_joints,1);
-            obj.Pkm1km1     = 0.01 * eye(n_joints);
-            obj.xkkm1       = ones(n_joints,1);
-            obj.Pkkm1       = 0.01 * eye(n_joints);
+            obj.xkm1km1     = zeros(n_joints,1);   % initial state estimate
+            obj.Pkm1km1     = 0.5 * eye(n_joints); % initial covariance
+            obj.xkkm1       = zeros(n_joints,1);   % will be overwritten
+            obj.Pkkm1       = 0.5 * eye(n_joints); % will be overwritten
             obj.Q           = q*eye(n_joints);
             obj.R           = r*eye(n_joints);
         end

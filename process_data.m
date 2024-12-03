@@ -7,10 +7,10 @@ clc
 addpath(genpath('src/'));
 addpath(genpath('utils/'));
 
-data_path = 'data_06_21_2024_14_35_56\';
-fname = [get_local_data_path(),data_path];
-addpath(genpath(fname));
-load([fname,'acquisition_params.mat']);
+data_path = 'data_10_24_2024_16_38_25/';
+im_data_folder = 'C:/Users/arosa/Desktop/Images_10_24_24\10_24_24';
+addpath(genpath([get_local_data_path(),data_path]));
+load([data_path,'acquisition_params.mat']);
 
 % get acquisition parameters
 n_acquisition_cycles             = acquisition_params.n_acquisition_cycles;
@@ -21,12 +21,14 @@ n_triggers_per_acquisition_cycle = acquisition_params.n_triggers_per_acquisition
 post_processing_params = PostProcessingParameters();
 
 % get key parameters
-mask_threshold      = post_processing_params.mask_threshold;
-image_crop_array    = post_processing_params.image_crop_array;
-smooth_before_fit   = post_processing_params.smooth_before_fit;
-spike_detect_thresh = post_processing_params.spike_detect_thresh;
-noise_floor         = post_processing_params.noise_floor;
-zero_length         = post_processing_params.zero_length;
+mask_threshold       = post_processing_params.mask_threshold;
+image_crop_array     = post_processing_params.image_crop_array;
+smooth_before_fit    = post_processing_params.smooth_before_fit;
+spike_detect_thresh  = post_processing_params.spike_detect_thresh;
+noise_floor          = post_processing_params.noise_floor;
+zero_length          = post_processing_params.zero_length;
+shadow_removal_array = post_processing_params.shadow_removal_array;
+wire_length          = post_processing_params.wire_length;
 
 
 % get derived parameters
@@ -61,16 +63,14 @@ for i = 1:n_acquisition_cycles
     
     % get the curvature and position arrays
     %now do the curvature from the images for each acq cycle
-    im_data_path = [data_path,'images/test_',num2str(i,'%03.f'),'/'];
-    [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(im_data_path,mask_threshold,image_crop_array,smooth_before_fit);
+    im_data_path = [im_data_folder,'/test_',num2str(i,'%03.f'),'/'];
+    [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(im_data_path,mask_threshold,image_crop_array,smooth_before_fit,shadow_removal_array,wire_length);
     
     % put reshaped Curvature data into data frame
-    
     Y(start_idx:end_idx,:) = curvature_array(1:end-1,:);
     Px(start_idx:end_idx,:) = x_array(1:end-1,:);
     Py(start_idx:end_idx,:) = y_array(1:end-1,:);
-%     %now remove the last frame and append to the end of a big list (this may be done already)
-%     
+    %now remove the last frame and append to the end of a big list (this may be done already)     
     
     
 end
@@ -90,6 +90,8 @@ for j = 1:a
 end
 %%
 % save waveform data Currently saves to the local directory cause im lazy 
+%well it actually doesnt save at all lol
+fname = [get_local_data_path(),data_path];
 save([fname,'X.mat'],'X');
 
 % curvature array and position arrays
@@ -106,6 +108,6 @@ save([fname,'/post_processing_params.mat'],'post_processing_params');
 %%
 
 % plot if needed to verify the fit
-%plotFitCurvatureImage(curvature_array,x_array,y_array,image_crop_array)
+plotFitCurvatureImage(curvature_array,x_array,y_array,image_crop_array)
 
 

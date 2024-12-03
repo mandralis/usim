@@ -1,16 +1,18 @@
-% clear all
-% close all
-% clc
-% 
-% %% load
-% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Px_array.mat');
-% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Py_array.mat');
+clear all
+close all
+clc
+
+%% load
+load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_07_05_2024_15_17_27/Px_array.mat');
+load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_07_05_2024_15_17_27/Py_array.mat')
+
 
 %% get number of data points
 N_samples = size(Px,1);
 
 %% get wire length in pixels
-L = max(Px(1,:));
+L = max(Px(1,:)); % we assume wire is straight in the first frame
+
 
 %% get wire clamped position in y
 py_clamp = Py(1,1);
@@ -27,7 +29,8 @@ a = [0, a_ * ones(1,N_joints)];
 Theta = zeros(N_samples,N_joints);
 Theta_relative = zeros(N_samples,N_joints);
 figure();
-for i = 1:10:size(Px,1)
+for i = 1:size(Px,1)
+    disp(i)
     % get current starting y position
     py_clamp = Py(i,1);
 
@@ -91,13 +94,6 @@ end
 % 
 %     Theta_predicted(i,:) = Theta_;
 % 
-%     % plot kinematic linkage with given angles
-%     plot(Px(i,:),Py(i,:),"Color",'b',LineWidth=1.0);
-%     axis([0,L,0,1080])
-%     hold on
-%     Pkin = forward_kin(0,a,a,a,a,Theta_(1),Theta_(2) - Theta_(1),Theta_(3) - Theta_(2),Theta_(4) - Theta_(3));
-%     plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
-%     pause(0.01);
-%     clf;
-% end
+
+save('Theta_relative.mat','Theta_relative')
 
