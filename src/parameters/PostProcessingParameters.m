@@ -9,7 +9,7 @@ classdef PostProcessingParameters
         
         %phase delay parameters 
         spike_detect_thresh               = -1.5;
-        noise_floor                       = 0.07
+        noise_floor                       = 0.07;
         zero_length                       = 1000;
     end
 end
