@@ -4,15 +4,33 @@ clc
 
 %% import neural net
 % Import the ONNX model as a dlnetwork
-net = importONNXNetwork('C:\Users\arosa\Box\USS Catheter\data\data_09_27_2024_15_40_55\model1.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork', 'dlnetwork');
+net = importONNXNetwork('C:\Users\arosa\Box\USS Catheter\data\data_10_24_2024_16_38_25\model2.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork', 'dlnetwork');
 
 %% load
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/X.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Px_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Bo  x/USS Catheter/data/data_09_27_2024_15_40_55/Py_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Theta_relative_8_joints.mat');
+load('C:\Users\arosa\Box\USS Catheter\data\data_10_24_2024_16_38_25/X.mat');
+load('C:\Users\arosa\Box\USS Catheter\data\data_10_24_2024_16_38_25/Px_array.mat');
+load('C:\Users\arosa\Box\USS Catheter\data\data_10_24_2024_16_38_25/Py_array.mat');
+load('C:\Users\arosa\Box\USS Catheter\data\data_10_24_2024_16_38_25/Theta_relative.mat');
+load('C:\Users\arosa\Box\USS Catheter\data\data_10_24_2024_16_38_25/acquisition_params.mat')
+
+%% get correct bounds for input X
+nx_start = 200 + 1;
+nx_end   = 1200;
+
+%% get time array
+t_total = (acquisition_params.t_per_acquisition - 0.5) * acquisition_params.n_acquisition_cycles_max;
+t = linspace(0,t_total,size(X,1));
+dt = t(2)-t(1);
 
 %% get normalized input data
+
+% remove nans from theta and also remove from same indices in X
+Theta_relative_cleaned = Theta_relative(~any(isnan(Theta_relative), 2), :);
+X_cleaned              = X(~any(isnan(Theta_relative), 2), :);
+
+% assign back to values
+Theta_relative = Theta_relative_cleaned;
+X = X_cleaned;
 
 % Normalize the input data X
 X_mean = mean(X, 1);  % Compute mean along the first dimension (rows)
@@ -26,58 +44,44 @@ Theta_relative_normalized = (Theta_relative - Theta_relative_mean) ./ (Theta_rel
 
 
 %% get wire length in pixels
-L = Px(1,end);
+L = max(Px(1,:));
 
 %% get wire clamped position in y
 py_clamp = Py(1,1);
 
 %% number of joints on kinematic linkage
-N_joints = 8;
+n_joints = 9;
 
 %% split wire in N_joints equal segments
-a_ = L/N_joints;
-a = [0, a_ * ones(1,N_joints)];
+a_ = L/n_joints;
+a = [0, a_ * ones(1,n_joints)];
 
-%% test neural network against data 
-
-% init filter
-alpha = 0.7;
-filter = ExponentialSmoothingFilter(N_joints,alpha);
-% N_window = 1;
-% filter = MovingAverageFilter(N_joints,N_window);
-% q = 1;
-% r = 1e-2;
-% filter = KalmanFilter(N_joints,q,r);
-
+%% infer on neural network
+% connect matlab to oscilloscope 
+myScope = connect();
 Theta_predicted = zeros(size(Theta_relative));
-for i = 1:size(Px,1)
-    
-    % get current starting position
-    py_clamp = Py(i,1);
+figure();
+hold on;
+while(1)    
+    X_unnormalized = getWaveform(myScope, 'acquisition', true);
+    clf;
+    X_ = (X_unnormalized - X_mean(nx_start:nx_end)) ./ (X_std(nx_start:nx_end) + 1e-6);
 
     % Convert input data to a dlarray
-    dlInput = dlarray(X_normalized(i,1:2000), 'BC');
+    dlInput = dlarray(X_, 'BC');
     Theta_relative_normalized = extractdata(predict(net, dlInput));
 
     % unnormalize the output
     Theta_relative_ = Theta_relative_normalized .* (Theta_relative_std' + 1e-6) + Theta_relative_mean';
 
-    % filter with kalman filter
-    Theta_relative_filtered = filter.update(Theta_relative_);
-
-    Theta_predicted(i,:) = Theta_relative_filtered;
-
-    % plot kinematic linkage with given angles
-    plot(Px(i,:),Py(i,:),"Color",'b',LineWidth=1.0);
-    axis([0,L,0,1080])
-    hold on
-    Pkin = forward_kin(a,Theta_relative_filtered');
-    Pkin_unfiltered = forward_kin(a,Theta_relative_');
-
+    % get and plot the predicted shape
+    Pkin = forward_kin(a,2*Theta_relative_');
+%     subplot(2,1,1)
     plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
-    plot(Pkin_unfiltered(2,:),Pkin_unfiltered(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'g','MarkerEdgeColor','k',LineWidth=1.0);
-
-    pause(0.01);
-    clf;
+    axis([0,L,0,1080]);
+%     subplot(2,1,2)
+%     plot(X_)
+    pause(0.01)
+    
 end
 
