@@ -7,7 +7,7 @@ clc
 addpath(genpath('src/'));
 addpath(genpath('utils/'));
 
-data_path = 'data_06_21_2024_14_35_56\';
+data_path = 'data_11_08_2024_16_47_09\';
 fname = [get_local_data_path(),data_path];
 addpath(genpath(fname));
 load([fname,'acquisition_params.mat']);
@@ -21,8 +21,6 @@ n_triggers_per_acquisition_cycle = acquisition_params.n_triggers_per_acquisition
 post_processing_params = PostProcessingParameters();
 
 % get key parameters
-mask_threshold      = post_processing_params.mask_threshold;
-image_crop_array    = post_processing_params.image_crop_array;
 smooth_before_fit   = post_processing_params.smooth_before_fit;
 spike_detect_thresh = post_processing_params.spike_detect_thresh;
 noise_floor         = post_processing_params.noise_floor;
@@ -33,13 +31,10 @@ zero_length         = post_processing_params.zero_length;
 n_valid_triggers_per_acquisition_cycle = n_triggers_per_acquisition_cycle - 1; 
 n_waveforms                            = n_acquisition_cycles * n_valid_triggers_per_acquisition_cycle;
 n_samples_per_waveform                 = n_samples_per_acquisition_cycle/n_triggers_per_acquisition_cycle;
-n_length_of_curv_array                 = image_crop_array(4)-image_crop_array(3)+1;
+
 
 % define the data frame 
 X = zeros(n_waveforms,n_samples_per_waveform);
-Y = zeros(n_waveforms,n_length_of_curv_array);
-Px = zeros(n_waveforms,n_length_of_curv_array);
-Py = zeros(n_waveforms,n_length_of_curv_array);
 
 %%
 for i = 1:n_acquisition_cycles
@@ -58,21 +53,15 @@ for i = 1:n_acquisition_cycles
   
     w_phase_locked = w(start_pos:end -(n_samples_per_waveform-start_pos)-1);
     X(start_idx:end_idx,:) = reshape(w_phase_locked,n_samples_per_waveform,n_valid_triggers_per_acquisition_cycle)';
+
+    % Get the angles for each aquisition cycle frame 
+    Position_matrix(:,:,i)
+    Optitrack_matrix = import_3D_point_matrix(filename, dataLines);
+    for i = 1:n_triggers_per_acquisition_cycle
     
-    % get the curvature and position arrays
-    %now do the curvature from the images for each acq cycle
-    im_data_path = [data_path,'images/test_',num2str(i,'%03.f'),'/'];
-    [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(im_data_path,mask_threshold,image_crop_array,smooth_before_fit);
-    
-    % put reshaped Curvature data into data frame
-    
-    Y(start_idx:end_idx,:) = curvature_array(1:end-1,:);
-    Px(start_idx:end_idx,:) = x_array(1:end-1,:);
-    Py(start_idx:end_idx,:) = y_array(1:end-1,:);
-%     %now remove the last frame and append to the end of a big list (this may be done already)
-%     
-    
-    
+        Position_matrix(:,:,i) = reshape(Optitrack_matrix(i,3:20),3,6);
+        
+    end
 end
 
 %% fix X matrix to make everything line up

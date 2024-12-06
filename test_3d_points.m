@@ -1,6 +1,6 @@
 
 %%
-a = table2array(ussc004);
+a = table2array(ussc001);
 
 
 for i = 1:442
