@@ -55,11 +55,11 @@ for i = 1:n_acquisition_cycles
     X(start_idx:end_idx,:) = reshape(w_phase_locked,n_samples_per_waveform,n_valid_triggers_per_acquisition_cycle)';
 
     % Get the angles for each aquisition cycle frame 
-    Position_matrix(:,:,i)
-    Optitrack_matrix = import_3D_point_matrix(filename, dataLines);
-    for i = 1:n_triggers_per_acquisition_cycle
+    Position_matrix = zeroes(3,6,n_triggers_per_acquisition_cycle);
+    Optitrack_matrix = import_3D_point_matrix([data_path,'ussc_',num2str(i,'%03.f'),'csv'], dataLines);
+    for j = 1:n_triggers_per_acquisition_cycle
     
-        Position_matrix(:,:,i) = reshape(Optitrack_matrix(i,3:20),3,6);
+        Position_matrix(:,:,j) = reshape(Optitrack_matrix(j,3:20),3,6);
         
     end
 end
@@ -81,14 +81,7 @@ end
 % save waveform data Currently saves to the local directory cause im lazy 
 save([fname,'X.mat'],'X');
 
-% curvature array and position arrays
-save([fname,'Y.mat'],'Y');
-save([fname,'Px_array.mat'],'Px');
-save([fname,'Py_array.mat'],'Py');
-% save('Y.mat','Y');
-% save('Px_array.mat','Px');
-% save('Py_array.mat','Py');
-
+% angle arrays
 % save post_processing parameters
 save([fname,'/post_processing_params.mat'],'post_processing_params');
 
