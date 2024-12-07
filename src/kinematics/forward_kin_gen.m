@@ -3,7 +3,7 @@ close all
 clc
 
 % define number of joints of kinematic linkage
-n_joints = 8;
+n_joints = 5;
 t = sym('t',[1,n_joints]);
 a = sym('a',[1,n_joints+1]);
 
@@ -47,7 +47,7 @@ for i = 1:n_joints
 end
 
 % make a matlab function for later use
-forward_kinematics = matlabFunction(pos,"File","src/kinematics/forward_kin","Vars",{a,t});
+forward_kinematics = matlabFunction(pos,"File","src/kinematics/forward_kin5","Vars",{a,t});
 
 %function used to calculate twist matrices
 function mat = twist(w,v,theta)

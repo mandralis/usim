@@ -2,7 +2,7 @@
 clear all
 close all
 clc
-
+%%
 % add necessary paths
 addpath(genpath('src/'));
 addpath(genpath('utils/'));
@@ -35,9 +35,15 @@ n_samples_per_waveform                 = n_samples_per_acquisition_cycle/n_trigg
 
 % define the data frame 
 X = zeros(n_waveforms,n_samples_per_waveform);
+Theta_relative_zx = zeros(n_waveforms,5);
+Theta_relative_yx = zeros(n_waveforms,5);
+
+Position_matrix_tot = zeros(3,6,n_waveforms);
+
 
 %%
 for i = 1:n_acquisition_cycles
+    
     % display counter
     disp(i)
 
@@ -55,13 +61,23 @@ for i = 1:n_acquisition_cycles
     X(start_idx:end_idx,:) = reshape(w_phase_locked,n_samples_per_waveform,n_valid_triggers_per_acquisition_cycle)';
 
     % Get the angles for each aquisition cycle frame 
-    Position_matrix = zeroes(3,6,n_triggers_per_acquisition_cycle);
-    Optitrack_matrix = import_3D_point_matrix([data_path,'ussc_',num2str(i,'%03.f'),'csv'], dataLines);
-    for j = 1:n_triggers_per_acquisition_cycle
+    Optitrack_matrix = import_3D_point_matrix([data_path,'ussc_',num2str(i,'%03.f'),'.csv']);
+    Position_matrix = zeros(3,6,n_valid_triggers_per_acquisition_cycle);
+    
+    for j = 1:n_valid_triggers_per_acquisition_cycle
     
         Position_matrix(:,:,j) = reshape(Optitrack_matrix(j,3:20),3,6);
         
     end
+    
+    [TR_zx,TR_yx] = get_angles_from_positions_3d(Position_matrix,n_valid_triggers_per_acquisition_cycle);
+    
+    Theta_relative_zx((i-1)*n_valid_triggers_per_acquisition_cycle+1:((i)*n_valid_triggers_per_acquisition_cycle),:) = TR_zx;
+    Theta_relative_yx((i-1)*n_valid_triggers_per_acquisition_cycle+1:((i)*n_valid_triggers_per_acquisition_cycle),:) = TR_yx;
+
+    Position_matrix_tot(:,:,(i-1)*n_valid_triggers_per_acquisition_cycle+1:((i)*n_valid_triggers_per_acquisition_cycle)) = Position_matrix;
+
+    
 end
 
 %% fix X matrix to make everything line up
@@ -71,15 +87,22 @@ end
 
 for j = 1:a 
     
-    ind = find(X(j,1:100) < spike_detect_thresh);
+    ind = find(X(j,1:2000) < spike_detect_thresh);
     position = ind(1);
     
     X(j,1:b-(position-1)) = X(j,position:end);
     
 end
+
+
 %%
+
 % save waveform data Currently saves to the local directory cause im lazy 
 save([fname,'X.mat'],'X');
+save([fname,'Theta_relative_zx.mat'],'Theta_relative_zx');
+save([fname,'Theta_relative_yx.mat'],'Theta_relative_yx');
+save([fname,'Position_matrix_tot.mat'],'Position_matrix_tot');
+
 
 % angle arrays
 % save post_processing parameters
