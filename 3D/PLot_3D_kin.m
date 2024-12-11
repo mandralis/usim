@@ -14,7 +14,7 @@ load([fname,'Theta_relative_zx.mat']);
 %%
 a(1:6) = 0.1;
 
-point_num = 2;
+point_num = 1;
 
 for i = 1:10:length(Theta_relative_yx)
     

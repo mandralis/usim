@@ -62,12 +62,21 @@ for i = 1:n_acquisition_cycles
 
     % Get the angles for each aquisition cycle frame 
     Optitrack_matrix = import_3D_point_matrix([data_path,'ussc_',num2str(i,'%03.f'),'.csv']);
+    Position_matrix_unsorted = zeros(3,6,n_valid_triggers_per_acquisition_cycle);
     Position_matrix = zeros(3,6,n_valid_triggers_per_acquisition_cycle);
-    
+
     for j = 1:n_valid_triggers_per_acquisition_cycle
     
-        Position_matrix(:,:,j) = reshape(Optitrack_matrix(j,3:20),3,6);
-        
+        Position_matrix_unsorted(:,:,j) = reshape(Optitrack_matrix(j,3:20),3,6); %this is unsprted (points are wrong order)
+               
+    end
+    
+    [~,sorted_ind]=sort(Position_matrix_unsorted(1,:,1));
+    
+    for ind = 1:6
+    
+        Position_matrix(:,ind,:) = Position_matrix_unsorted(:,sorted_ind(ind),:);
+    
     end
     
     [TR_zx,TR_yx] = get_angles_from_positions_3d(Position_matrix,n_valid_triggers_per_acquisition_cycle);
