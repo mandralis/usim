@@ -65,13 +65,16 @@ for i = 1:n_acquisition_cycles
     Position_matrix_unsorted = zeros(3,6,n_valid_triggers_per_acquisition_cycle);
     Position_matrix = zeros(3,6,n_valid_triggers_per_acquisition_cycle);
 
+    
+    %get the position of the optitrack sensors 
     for j = 1:n_valid_triggers_per_acquisition_cycle
     
-        Position_matrix_unsorted(:,:,j) = reshape(Optitrack_matrix(j,3:20),3,6); %this is unsprted (points are wrong order)
+        Position_matrix_unsorted(:,:,j) = reshape(Optitrack_matrix(j,3:20),3,6); %this is unsorted (points are wrong order)
                
     end
     
-    [~,sorted_ind]=sort(Position_matrix_unsorted(1,:,1));
+    %sort points in x position order
+    [~,sorted_ind]=sort(Position_matrix_unsorted(1,:,1)); 
     
     for ind = 1:6
     
@@ -79,6 +82,7 @@ for i = 1:n_acquisition_cycles
     
     end
     
+    %find relative angles while keeping either z or y constant
     [TR_zx,TR_yx] = get_angles_from_positions_3d(Position_matrix,n_valid_triggers_per_acquisition_cycle);
     
     Theta_relative_zx((i-1)*n_valid_triggers_per_acquisition_cycle+1:((i)*n_valid_triggers_per_acquisition_cycle),:) = TR_zx;
@@ -104,6 +108,10 @@ for j = 1:a
 end
 
 
+%% Save thetas as one long array
+Theta_relative_3D= [Theta_relative_yx, Theta_relative_zx];
+
+
 %%
 
 % save waveform data Currently saves to the local directory cause im lazy 
@@ -111,6 +119,8 @@ save([fname,'X.mat'],'X');
 save([fname,'Theta_relative_zx.mat'],'Theta_relative_zx');
 save([fname,'Theta_relative_yx.mat'],'Theta_relative_yx');
 save([fname,'Position_matrix_tot.mat'],'Position_matrix_tot');
+save([fname,'Theta_relative_3D.mat'],'Theta_relative_3D');
+
 
 
 % angle arrays
