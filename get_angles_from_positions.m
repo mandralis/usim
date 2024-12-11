@@ -6,17 +6,19 @@ clc
 load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_07_05_2024_15_17_27/Px_array.mat');
 load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_07_05_2024_15_17_27/Py_array.mat')
 
+
 %% get number of data points
 N_samples = size(Px,1);
 
 %% get wire length in pixels
-L = Px(1,end);
+L = max(Px(1,:)); % we assume wire is straight in the first frame
+
 
 %% get wire clamped position in y
 py_clamp = Py(1,1);
 
 %% number of joints on kinematic linkage
-N_joints = 8;
+N_joints = 9;
 
 %% split wire in n_joints equal segments
 a_ = L/N_joints;
@@ -58,15 +60,40 @@ for i = 1:size(Px,1)
     % convert to relative angle for kinematic linkage
     Theta_relative(i,:) = [Theta(i,1), diff(Theta(i,:))];
 
-%     % plot kinematic linkage with given angles
-%     plot(Px(i,:),Py(i,:),"Color",'b',LineWidth=1.0);
-%     axis([0,L,0,1080])
-%     hold on
-%     Pkin = forward_kin(a,Theta_relative(i,:));
-%     plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
-%     pause(0.01);
-%     clf;
+    % plot kinematic linkage with given angles
+    plot(Px(i,:),Py(i,:),"Color",'b',LineWidth=1.0);
+    axis([0,L,0,1080])
+    hold on
+    Pkin = forward_kin(a,Theta_relative(i,:));
+    plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
+    pause(0.01);
+    clf;
 end
+
+% save('Theta_relative.mat','Theta_relative')
+
+% %% test fit
+% % linear regression to map amplitudes to angles 
+% load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/ampl.mat')
+% % load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_05_26_2024_16_54_50/Theta_no_arclength.mat')
+% load('Theta_relative.mat');
+% 
+% % augment amplitude to fit a bias
+% ampl_aug = zeros(size(ampl,1),size(ampl,2)+1);
+% for i=1:size(ampl,1)
+%     ampl_aug(i,:) = [1,ampl(i,:)];
+% end
+% 
+% % get parameters
+% fit = pinv(ampl_aug) * Theta_relative;
+% 
+% Theta_predicted = zeros(size(Theta_relative));
+% for i = 1:size(Px,1)
+%     % predict theta
+%     Theta_ = ampl_aug(i,:) * fit;
+% 
+%     Theta_predicted(i,:) = Theta_;
+% 
 
 save('Theta_relative.mat','Theta_relative')
 
