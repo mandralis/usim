@@ -61,9 +61,9 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Load data
-    nx_start, nx_end = 200, 1200
-    X = sio.loadmat('/home/m4pc/Desktop/data_09_27_2024_15_40_55/X.mat')['X'][:, nx_start:nx_end]
-    Theta = sio.loadmat('/home/m4pc/Desktop/data_09_27_2024_15_40_55/Theta_relative.mat')['Theta_relative']
+    nx_start, nx_end = 200, 1000
+    X = sio.loadmat('/home/m4pc/Desktop/X.mat')['X'][:, nx_start:nx_end]
+    Theta = sio.loadmat('/home/m4pc/Desktop/Theta_relative_3D.mat')['Theta_relative_3D']
 
     # Convert data to tensor and float32
     X = torch.tensor(X).float().to(device)
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     Theta = (Theta - Theta_mean) / Theta_std
 
     # Set hyperparameters
-    dim_n_joints = 8
+    dim_n_joints = 10
     batch_size = 512 # really important but 128 is a good start
     layer_dims = [512,256,128,64,32]
     # layer_dims = [1024,512,256]
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     dim_in = X.shape[1]
     dim_out = Theta.shape[1]
     learning_rate = 0.0005
-    num_epochs = 2500
+    num_epochs = 3000
     validation_split = 0.2  # 20% of the data will be used for validation
 
     # Create train folder

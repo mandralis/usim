@@ -6,7 +6,7 @@ from IPython import embed
 from train import ConvNet
 
 # Train folder path
-train_path = "/home/m4pc/usim/src/learning/+learned_models/20241024-093048"
+train_path = "/home/m4pc/usim/src/learning/+learned_models/20241211-114704"
 
 # Load data
 train_data           = torch.load(os.path.join(train_path, 'train_data.pth'))
@@ -44,7 +44,7 @@ Theta_val = Theta * Theta_std + Theta_mean
 # Plot the results on the full set (training + validation)
 plt.figure(figsize=(12, 6))
 for i in range(config.get('dim_out')):
-    plt.subplot(3, 3, i+1)
+    plt.subplot(3, 4, i+1)
     plt.plot(Theta_val[:, i].detach().numpy(), 'b', label='Actual')
     plt.plot(Theta_predicted_val[:, i].detach().numpy(), 'r', label='Predicted')
     plt.xlabel('Sample')
