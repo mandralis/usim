@@ -70,7 +70,7 @@ filtering       = true;
 Theta_predicted = zeros(size(Theta_relative_3D));
 figure();
 hold on;
-for i = 1:length(Theta_relative_3D(:,1))
+for i = 1:50:length(Theta_relative_3D(:,1))
     % get current starting position (MODIFY)
 %     py_clamp = Py(i,1);
 
@@ -99,7 +99,7 @@ for i = 1:length(Theta_relative_3D(:,1))
         
         % get and plot the predicted shape
         subplot(2,1,1)
-        scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(2,:,i)-Position_matrix_tot(2,point_num,i))
+%         scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(2,:,i)-Position_matrix_tot(2,point_num,i))
         axis([-0.3,0.7,-.3,0.3])
         hold on
         Pkin = forward_kin5(a,Theta_relative_3D(i,1:5));
@@ -109,7 +109,7 @@ for i = 1:length(Theta_relative_3D(:,1))
         
         
         subplot(2,1,2)
-        scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(3,:,i)-Position_matrix_tot(3,point_num,i))
+%         scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(3,:,i)-Position_matrix_tot(3,point_num,i))
         axis([-0.3,0.7,-.3,0.3])
         hold on
         Pkin = forward_kin5(a,Theta_relative_3D(i,6:10));
@@ -123,7 +123,7 @@ for i = 1:length(Theta_relative_3D(:,1))
 
     
     drawnow
-    pause(0.01)
+    pause()
     clf
 %     % pause for time dt to get a (quasi) real time loop
 %     

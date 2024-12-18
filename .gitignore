@@ -6,3 +6,6 @@
 **/*.pyca
 **+model
 src/learning/logs
+logs
+**/*.txt
+**/*.md
