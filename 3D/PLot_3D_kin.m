@@ -57,7 +57,8 @@ for i =1:10:length(Theta_relative_yx)
     view([1,1,1])
     
     drawnow
-    pause(0.01)
+    %pause(0.01)
+    saveas(gcf,['3dplot',num2str(i),'.tif']);
     clf
     
 end
