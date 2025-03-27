@@ -2,9 +2,9 @@ classdef PostProcessingParameters
     properties
         % image processing parameters
         mask_threshold                    = 110;
-        image_crop_array                  = [1 1080 1 1920];
+        image_crop_array                  = [1 1080 50 1920];
         smooth_before_fit                 = false;
-        shadow_removal_array              = [904,1080,884,1052]
+        shadow_removal_array              = [904,1080,884,1152]
         wire_length                       = 1500;
         
         %phase delay parameters 

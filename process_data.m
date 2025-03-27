@@ -7,8 +7,8 @@ clc
 addpath(genpath('src/'));
 addpath(genpath('utils/'));
 
-data_path = 'data_10_24_2024_16_38_25/';
-im_data_folder = 'C:/Users/arosa/Desktop/Images_10_24_24\10_24_24';
+data_path = 'data_02_10_2025_17_22_39\';
+im_data_folder = 'C:\Users\arosa\Desktop\Images_2_10_25\2_10_25';
 addpath(genpath([get_local_data_path(),data_path]));
 load([data_path,'acquisition_params.mat']);
 
@@ -63,7 +63,7 @@ for i = 1:n_acquisition_cycles
     
     % get the curvature and position arrays
     %now do the curvature from the images for each acq cycle
-    im_data_path = [im_data_folder,'/test_',num2str(i,'%03.f'),'/'];
+    im_data_path = [im_data_folder,'\test_',num2str(i,'%03.f'),'/'];
     [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(im_data_path,mask_threshold,image_crop_array,smooth_before_fit,shadow_removal_array,wire_length);
     
     % put reshaped Curvature data into data frame
@@ -108,6 +108,6 @@ save([fname,'/post_processing_params.mat'],'post_processing_params');
 %%
 
 % plot if needed to verify the fit
-plotFitCurvatureImage(curvature_array,x_array,y_array,image_crop_array)
+%plotFitCurvatureImage(curvature_array,x_array,y_array,image_crop_array)
 
 

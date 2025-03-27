@@ -6,7 +6,7 @@ from IPython import embed
 from train import ConvNet
 
 # Train folder path
-train_path = "/home/m4pc/usim/src/learning/+learned_models/20241211-114704"
+train_path = "C:/Users/arosa/usim/src/learning/learned_models/20250210-201426"
 
 # Load data
 train_data           = torch.load(os.path.join(train_path, 'train_data.pth'))
@@ -29,7 +29,7 @@ model.eval()
 # also save as onnx for use in Matlab
 import torch.onnx
 example_input = X[0].unsqueeze(0)
-torch.onnx.export(model, example_input, "model.onnx", export_params=True, opset_version=11,
+torch.onnx.export(model, example_input, "model-demo.onnx", export_params=True, opset_version=11,
                 do_constant_folding=True, input_names=['input'], output_names=['output'])
 
 # Perform inference
@@ -45,8 +45,20 @@ Theta_val = Theta * Theta_std + Theta_mean
 plt.figure(figsize=(12, 6))
 for i in range(config.get('dim_out')):
     plt.subplot(3, 4, i+1)
-    plt.plot(Theta_val[:, i].detach().numpy(), 'b', label='Actual')
-    plt.plot(Theta_predicted_val[:, i].detach().numpy(), 'r', label='Predicted')
+    plt.plot(Theta_val[:, i].detach().numpy(), 'k|', label='Actual')
+    plt.plot(Theta_predicted_val[:, i].detach().numpy(), 'y-' , label='Predicted')
+    plt.xlabel('Sample')
+    plt.ylabel('Angle')
+    plt.title(f'Angle {i+1}')
+    plt.legend()
+plt.tight_layout()
+plt.show()
+
+# Plot The deviation
+plt.figure(figsize=(12, 6))
+for i in range(config.get('dim_out')):
+    plt.subplot(3, 4, i+1)
+    plt.plot(Theta_predicted_val[:, i].detach().numpy()-Theta_val[:, i].detach().numpy(), 'b', label='Angle Deviation')
     plt.xlabel('Sample')
     plt.ylabel('Angle')
     plt.title(f'Angle {i+1}')

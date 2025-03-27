@@ -3,8 +3,8 @@ close all
 clc
 
 %% load
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_07_05_2024_15_17_27/Px_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_07_05_2024_15_17_27/Py_array.mat')
+load('C:\Users\arosa\Box\USS Catheter\data\data_02_10_2025_17_22_39\Px_array.mat');
+load('C:\Users\arosa\Box\USS Catheter\data\data_02_10_2025_17_22_39\Py_array.mat')
 
 
 %% get number of data points

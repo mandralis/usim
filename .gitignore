@@ -4,6 +4,7 @@
 **/*.pth
 **/*.onnx
 **/*.pyca
-**+model
+offset*
+**+model*
 src/learning/logs
 logs

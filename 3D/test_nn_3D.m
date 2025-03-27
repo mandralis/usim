@@ -16,9 +16,9 @@ load('C:\Users\arosa\Box\USS Catheter\3d_data\data_11_08_2024_16_47_09\acquisiti
 data_path = 'data_11_08_2024_16_47_09\';
 fname = [get_local_data_path(),data_path];
 
-load([fname,'Position_matrix_tot.mat']);
-load([fname,'Theta_relative_yx.mat']);
-load([fname,'Theta_relative_zx.mat']);
+load('C:\Users\arosa\Box\USS Catheter\3d_data\data_11_08_2024_16_47_09\Position_matrix_tot.mat');
+load('C:\Users\arosa\Box\USS Catheter\3d_data\data_11_08_2024_16_47_09\Theta_relative_yx.mat');
+load('C:\Users\arosa\Box\USS Catheter\3d_data\data_11_08_2024_16_47_09\Theta_relative_zx.mat');
 
 
 %% get correct bounds for input X
@@ -77,7 +77,7 @@ filter = IdentityFilter();
 point_num = 1; %which point is the zero position
 filtering       = true;
 Theta_predicted = zeros(size(Theta_relative_3D));
-figure();
+
 hold on;
 for i = 1:50:length(Theta_relative_3D(:,1))
     % get current starting position (MODIFY)
@@ -105,29 +105,35 @@ for i = 1:50:length(Theta_relative_3D(:,1))
     
     % at update rate plot the model prediction
     if mod(i,1) == 0
+
+        figure(1)
+        clf
+        % get and plot the predicted shape
+        subplot(2,1,1)
+        %         scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(2,:,i)-Position_matrix_tot(2,point_num,i))
+        axis([-0.3,0.7,-.3,0.3])
+        hold on
+        Pkin = forward_kin5(a,Theta_relative_filtered(1:5)');
+        plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','c',"Color",'c','MarkerEdgeColor','c',LineWidth=6.0);
+
+        Pkin = forward_kin5(a,Theta_relative_3D(i,1:5));
+        plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'k','MarkerEdgeColor','k',LineWidth=1.0);
         
-        %         % get and plot the predicted shape
-        %         subplot(2,1,1)
-        % %         scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(2,:,i)-Position_matrix_tot(2,point_num,i))
-        %         axis([-0.3,0.7,-.3,0.3])
-        %         hold on
-        %         Pkin = forward_kin5(a,Theta_relative_3D(i,1:5));
-        %         plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
-        %         Pkin = forward_kin5(a,Theta_relative_filtered(1:5)');
-        %         plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'b','MarkerEdgeColor','k',LineWidth=1.0);
-        %
-        %
-        %         subplot(2,1,2)
-        % %         scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(3,:,i)-Position_matrix_tot(3,point_num,i))
-        %         axis([-0.3,0.7,-.3,0.3])
-        %         hold on
-        %         Pkin = forward_kin5(a,Theta_relative_3D(i,6:10));
-        %         plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
-        %         Pkin = forward_kin5(a,Theta_relative_filtered(6:10)');
-        %         plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'b','MarkerEdgeColor','k',LineWidth=1.0);
-        %
-        %
-        %
+        title('Top View')
+
+        subplot(2,1,2)
+        %         scatter(Position_matrix_tot(1,:,i)-Position_matrix_tot(1,point_num,i),Position_matrix_tot(3,:,i)-Position_matrix_tot(3,point_num,i))
+        axis([-0.3,0.7,-.3,0.3])
+        hold on
+        
+        Pkin = forward_kin5(a,Theta_relative_filtered(6:10)');
+        plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','c',"Color",'c','MarkerEdgeColor','c',LineWidth=6.0);
+
+        Pkin = forward_kin5(a,Theta_relative_3D(i,6:10));
+        plot(Pkin(2,:)-Pkin(2,1),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'k','MarkerEdgeColor','k',LineWidth=1.0);
+        
+        title('Side View')
+
         
         
         k = 1;
@@ -139,31 +145,29 @@ for i = 1:50:length(Theta_relative_3D(:,1))
         end
         
  
-        
+        figure(2)
         %     subplot(2,2,3)
         b = Position_matrix_tot(:,:,i);
-        scatter3(b(1,:)- b(1,1),b(2,:)-b(2,1),b(3,:)-b(3,1))
+%         scatter3(b(1,:)- b(1,1),b(2,:)-b(2,1),b(3,:)-b(3,1))
         axis([0 .6 -.6 .6 -.6 .6]);
         hold on
         
-        Pkin = forward_kin_3d(a,theta);
+        Pkin = forward_kin_3d(a,Theta_relative_3D(i,:));
         plot3(Pkin(2,:)-Pkin(2,1),-(Pkin(3,:)-Pkin(3,1)),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'b','MarkerEdgeColor','k',LineWidth=1.0);
         %     axis([0 0.6 -1 1 -1 1 ]);
-        Pkin = forward_kin_3d(a,Theta_relative_filtered);
+        Pkin = forward_kin_3d(a,Theta_relative_filtered');
         plot3(Pkin(2,:)-Pkin(2,1),-(Pkin(3,:)-Pkin(3,1)),Pkin(1,:)-Pkin(1,1),'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
         
         view([1,1,1])
         
-        drawnow
-        %pause(0.01)
-       % saveas(gcf,['3dplot',num2str(i),'.tif']);
-        clf
+     
         
     end
     
     
     drawnow
     pause()
+%     saveas(gcf,['3dplot',num2str(i),'.tif']);
     clf
 %     % pause for time dt to get a (quasi) real time loop
 %     

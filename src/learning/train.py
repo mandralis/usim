@@ -62,8 +62,8 @@ if __name__ == '__main__':
 
     # Load data
     nx_start, nx_end = 200, 1000
-    X = sio.loadmat('/home/m4pc/Desktop/X.mat')['X'][:, nx_start:nx_end]
-    Theta = sio.loadmat('/home/m4pc/Desktop/Theta_relative_3D.mat')['Theta_relative_3D']
+    X = sio.loadmat(r"C:\Users\arosa\Box\USS Catheter\data\data_02_10_2025_17_22_39\X.mat")['X'][:, nx_start:nx_end]
+    Theta = sio.loadmat(r"C:\Users\arosa\Box\USS Catheter\data\data_02_10_2025_17_22_39\Theta_relative.mat")['Theta_relative']
 
     # Convert data to tensor and float32
     X = torch.tensor(X).float().to(device)
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     Theta = (Theta - Theta_mean) / Theta_std
 
     # Set hyperparameters
-    dim_n_joints = 10
+    dim_n_joints = 9
     batch_size = 512 # really important but 128 is a good start
     layer_dims = [512,256,128,64,32]
     # layer_dims = [1024,512,256]
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     # Create train folder
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    folder_path = f"/home/m4pc/usim/src/learning/+learned_models/{timestamp}"
+    folder_path = f"C:/Users/arosa/usim/src/learning/learned_models/{timestamp}"
     os.makedirs(folder_path, exist_ok=True)
 
     # Save config
@@ -178,6 +178,7 @@ if __name__ == '__main__':
 
     # Set up TensorBoard
     log_dir = os.path.join("logs", timestamp)
+    print(r"log_dir: {}".format(log_dir))
     writer = SummaryWriter(log_dir)
 
     # Training loop

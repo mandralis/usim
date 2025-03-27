@@ -73,13 +73,18 @@ function [curvature_array,x_array,y_array] = getCurvatureAndPositionArrays(datap
         % add positions to position arrays
         x_array(i,1:xpoints(end)) = xpoints_fine;
         y_array(i,1:xpoints(end)) = ypoints_fine;
+       
+        %display fit 
 %         clf
 %         imagesc(flipud(im))
 %         hold on
 %         scatter(xpoints_fine,ypoints_fine)
 %         %scatter(xpoints,ypoints)
 %         axis([1 1920 1 1080])
-%         pause(0.01)
+%         drawnow
+%%         pause(0.01)
+
+
         % increment loop
         i = i+1;   
     end

@@ -1,5 +1,5 @@
 % clear workspace
-clear all
+clear 
 close all
 clc
 
@@ -7,10 +7,11 @@ clc
 addpath(genpath('src/'));
 addpath(genpath('utils/'));
 
-data_path = 'data_07_05_2024_15_17_27/';
-im_data_folder = 'C:/Users/arosa/Desktop/images_7_5_24/7_5_24';
-addpath(genpath([get_local_data_path(),data_path]));
-load([data_path,'acquisition_params.mat']);
+%Parameters_path = 'C:\Users\arosa\usim\src\parameters'; dont think this is
+%needed
+%im_data_folder = 'C:/Users/arosa/Desktop/images_7_5_24/7_5_24';
+%addpath(genpath([get_local_data_path(),data_path]));
+%load([Parameters_path,'acquisition_params.mat']);
 
 % instantiate object from Parameters class
 acquisition_params = AcquisitionParameters();

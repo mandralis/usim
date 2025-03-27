@@ -2,20 +2,27 @@ clear all
 close all
 clc
 
+
+%%
+addpath(genpath('src/'));
+addpath(genpath('utils/'));
+
 %% import neural net
 % Import the ONNX model as a dlnetwork
-net = importONNXNetwork('C:\Users\arosa\Box\USS Catheter\data\data_09_27_2024_15_40_55\model1.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork', 'dlnetwork');
+net = importONNXNetwork('C:\Users\arosa\usim\model_demo.onnx', 'InputDataFormats', {'BC'}, 'TargetNetwork', 'dlnetwork');
 
 %% load
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/X.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Px_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Py_array.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/Theta_relative.mat');
-load('/Users/imandralis/Library/CloudStorage/Box-Box/USS Catheter/data/data_09_27_2024_15_40_55/acquisition_params.mat')
+data_path = 'C:\Users\arosa\Box\USS Catheter\data\data_02_10_2025_17_22_39\';
+
+load([data_path,'X.mat']);
+load([data_path,'Px_array.mat']);
+load([data_path,'Py_array.mat']);
+load([data_path,'Theta_relative.mat']);
+load([data_path,'acquisition_params.mat'])
 
 %% get correct bounds for input X
 nx_start = 200 + 1;
-nx_end   = 1200;
+nx_end   = 1000;
 
 %% get time array
 t_total = (acquisition_params.t_per_acquisition - 0.5) * acquisition_params.n_acquisition_cycles_max;
@@ -50,7 +57,7 @@ L = max(Px(1,:));
 py_clamp = Py(1,1);
 
 %% number of joints on kinematic linkage
-n_joints = 8;
+n_joints = 9;
 
 %% split wire in N_joints equal segments
 a_ = L/n_joints;
@@ -73,7 +80,7 @@ filtering       = true;
 Theta_predicted = zeros(size(Theta_relative));
 figure();
 hold on;
-for i = 1:size(Px,1)
+for i = 1:25:size(Px,1)
     % get current starting position
     py_clamp = Py(i,1);
 
@@ -93,7 +100,7 @@ for i = 1:size(Px,1)
 
     % plot kinematic linkage with given angles
     max_x = max(Px(i,:));
-    plot(Px(i,1:max_x),Py(i,1:max_x),"Color",'b',LineWidth=1.0);
+    plot(Px(i,1:max_x),Py(i,1:max_x),"Color",'c',LineWidth=6.0);
     axis([0,L,0,1080])
     hold on
 
@@ -101,11 +108,12 @@ for i = 1:size(Px,1)
     if mod(i,1) == 0
         % get and plot the predicted shape
         Pkin = forward_kin(a,Theta_relative_filtered');
-        plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'r','MarkerEdgeColor','k',LineWidth=1.0);
+        plot(Pkin(2,:),Pkin(1,:) + py_clamp,'Marker','o','MarkerFaceColor','k',"Color",'k','MarkerEdgeColor','k',LineWidth=1.0);
     end
+    title(num2str(i))
 
     % pause for time dt to get a (quasi) real time loop 
-    pause(dt);
+    pause();
     clf;
 end
 
